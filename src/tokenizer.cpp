@@ -2,10 +2,38 @@
 
 #include <cassert>
 #include <cctype>  // isspace
+#include <cstdlib> // exit
 #include <iomanip> // std::hex
 #include <iostream>
 
-std::ostream & operator<<(std::ostream & lhs, const token & rhs) { return lhs << rhs.raw_data; }
+std::ostream & operator<<(std::ostream & lhs, const token & rhs) {
+    switch (rhs.type()) {
+    case token_type::eof:
+        return lhs << "EOF";
+    case token_type::str:
+        return lhs << rhs.raw_data;
+    case token_type::newline:
+        return lhs << "\\n";
+    case token_type::semicolon:
+        return lhs << ';';
+    case token_type::left_arrow:
+        return lhs << '<';
+    case token_type::right_arrow:
+        return lhs << '>';
+    case token_type::pipe:
+        return lhs << '|';
+    case token_type::left_brace:
+        return lhs << '{';
+    case token_type::right_brace:
+        return lhs << '{';
+    case token_type::t_or:
+        return lhs << "or";
+    case token_type::t_and:
+        return lhs << "and";
+    }
+    std::cerr << "Unprintable token type: " << rhs.type() << std::endl;
+    exit(3);
+}
 
 token tokenizer::next() {
     // Skip whitespace
