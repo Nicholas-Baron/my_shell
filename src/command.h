@@ -64,6 +64,8 @@ class simple_command final : public command {
 
     void append_arg(std::string && arg) { arguments.push_back(std::move(arg)); }
 
+    void append_redirect(redirect, std::string &&);
+
   protected:
     void print_command(std::ostream &) const final;
 

@@ -17,6 +17,7 @@ command_ptr parser::parse_command() {
     case token_type::str:
         return parse_simple_command(tok.raw());
     default:
+        // TODO: Turn this into a common macro
         std::cerr << "Unknown token in " << __PRETTY_FUNCTION__ << " : " << tok << std::endl;
         exit(1);
     }
@@ -41,7 +42,36 @@ token & parser::peek() {
 command_ptr parser::parse_simple_command(std::string && name) {
     simple_command cmd{std::move(name)};
 
-    while (peek().type() == token_type::str) cmd.append_arg(std::move(next().raw()));
+    while (true) {
+        // A raw string is just an argument
+        if (peek().type() == token_type::str) {
+            cmd.append_arg(std::move(next().raw()));
+            continue;
+        }
+
+        // Redirects can occur anywhere in the argument list
+        if (peek().file_redirect()) {
+            auto redirection = next();
+            auto file = next();
+            assert(file.type() == token_type::str);
+
+            switch (redirection.type()) {
+            case token_type::left_arrow:
+                cmd.append_redirect(redirect::stdin, file.raw());
+                break;
+            case token_type::right_arrow:
+                cmd.append_redirect(redirect::stdout, file.raw());
+                break;
+            default:
+                std::cerr << "Unknown redirection type to file " << file << " : " << redirection
+                          << std::endl;
+                exit(2);
+            }
+            continue;
+        }
+
+        break;
+    }
 
     return std::make_unique<simple_command>(std::move(cmd));
 }

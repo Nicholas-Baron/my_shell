@@ -17,3 +17,14 @@ void simple_command::print_command(std::ostream & lhs) const {
             break;
         }
 }
+
+void simple_command::append_redirect(redirect redir, std::string && file) {
+
+    if (auto iter = redirects.find(redir); iter != redirects.end()) {
+        std::cout << "Ignoring redirect about file " << iter->second << "\nNow using " << file
+                  << " instead\n";
+        iter->second = std::move(file);
+    } else {
+        redirects.emplace(redir, std::move(file));
+    }
+}

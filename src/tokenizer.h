@@ -33,6 +33,9 @@ class token final {
     }
 
     [[nodiscard]] token_type type() const noexcept { return typ; }
+    [[nodiscard]] bool file_redirect() const noexcept {
+        return typ == token_type::left_arrow or typ == token_type::right_arrow;
+    }
 
     [[nodiscard]] const std::string & raw() const { return raw_data; }
     [[nodiscard]] std::string raw() { return raw_data; }
