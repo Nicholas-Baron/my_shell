@@ -74,6 +74,12 @@ token tokenizer::next() {
         ++pos;
         return {token_type::str, std::move(raw)};
     } break;
+    case ';':
+        return token_type::semicolon;
+    case '{':
+        return token_type::left_brace;
+    case '}':
+        return token_type::right_brace;
     case '|':
         if (peek() == c) {
             ++pos;

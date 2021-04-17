@@ -22,6 +22,7 @@ class parser final {
   private:
     [[nodiscard]] command_ptr parse_command();
     [[nodiscard]] command_ptr parse_simple_command(std::string && name);
+    [[nodiscard]] command_ptr parse_command_block();
 
     token next();
     token & peek();

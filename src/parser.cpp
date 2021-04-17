@@ -16,6 +16,8 @@ command_ptr parser::parse_command() {
     switch (tok.type()) {
     case token_type::str:
         return parse_simple_command(tok.raw());
+    case token_type::left_brace:
+        return parse_command_block();
     default:
         // TODO: Turn this into a common macro
         std::cerr << "Unknown token in " << __PRETTY_FUNCTION__ << " : " << tok << std::endl;
@@ -74,4 +76,19 @@ command_ptr parser::parse_simple_command(std::string && name) {
     }
 
     return std::make_unique<simple_command>(std::move(cmd));
+}
+
+command_ptr parser::parse_command_block() {
+    command_block block;
+
+    while (peek().type() != token_type::right_brace) {
+        if (peek().type() == token_type::newline or peek().type() == token_type::semicolon) {
+            next();
+        } else {
+            block.append_command(parse_simple_command(next().raw()));
+        }
+    }
+
+    assert(next().type() == token_type::right_brace);
+    return std::make_unique<command_block>(std::move(block));
 }
