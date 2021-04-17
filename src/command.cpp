@@ -1,4 +1,5 @@
 #include "command.h"
+#include "executor.h"
 
 #include <iostream>
 
@@ -28,6 +29,8 @@ void simple_command::append_redirect(redirect redir, std::string && file) {
         redirects.emplace(redir, std::move(file));
     }
 }
+
+void simple_command::execute(executor & executor) const { executor.execute(*this); }
 
 void command_block::print_command(std::ostream & lhs) const {
     lhs << "{\n";

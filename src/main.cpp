@@ -1,3 +1,4 @@
+#include "executor.h"
 #include "parser.h"
 #include "tokenizer.h"
 
@@ -5,6 +6,8 @@
 #include <string>
 
 int main() {
+
+    executor e;
 
     // TODO: Take command line args
     std::string input;
@@ -15,5 +18,7 @@ int main() {
         auto command_list = p.parse();
         std::cout << "Parsed commands:\n";
         for (auto & command : command_list) { std::cout << *command << std::endl; }
+
+        for (auto & command : command_list) command->execute(e);
     }
 }

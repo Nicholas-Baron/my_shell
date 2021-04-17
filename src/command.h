@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+class executor;
+
 class command {
   public:
     constexpr command() = default;
@@ -19,6 +21,8 @@ class command {
     command & operator=(command &&) = default;
 
     virtual ~command() noexcept = default;
+
+    virtual void execute(executor &) const = 0;
 
   protected:
     virtual void print_command(std::ostream &) const = 0;
@@ -44,6 +48,10 @@ class command_block final : public command {
 
     void append_command(command_ptr cmd) { commands.push_back(std::move(cmd)); }
 
+    void execute(executor & e) const {
+        for (auto & cmd : commands) cmd->execute(e);
+    }
+
   protected:
     void print_command(std::ostream &) const final;
 
@@ -67,14 +75,17 @@ class simple_command final : public command {
 
     ~simple_command() noexcept final = default;
 
-    void append_arg(std::string && arg) { arguments.push_back(std::move(arg)); }
+    // ^command
+    void execute(executor &) const;
 
+    void append_arg(std::string && arg) { arguments.push_back(std::move(arg)); }
     void append_redirect(redirect, std::string &&);
 
   protected:
     void print_command(std::ostream &) const final;
 
   private:
+    friend executor; // TODO: Reconsider this.
     std::string executable{};
     std::vector<std::string> arguments{};
     std::map<redirect, std::string> redirects{};
