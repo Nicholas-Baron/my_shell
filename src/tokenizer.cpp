@@ -95,7 +95,7 @@ token tokenizer::next() {
         ++pos;
         return token_type::t_and;
     default:
-        if (isalnum(c) or c == '/') {
+        if (isalnum(c) or c == '/' or c == '.' or c == '-') {
             // Consume the raw string
             std::string raw;
             raw += c;
