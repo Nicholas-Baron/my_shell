@@ -99,7 +99,7 @@ token tokenizer::next() {
             }
             return {token_type::str, std::move(raw)};
         }
-        std::cerr << "Found unknown character: '" << c << "' (" << std::hex << (unsigned)c << ')'
+        std::cerr << "Found unknown character: '" << c << "' (0x" << std::hex << (unsigned)c << ')'
                   << std::endl;
         exit(2);
     }

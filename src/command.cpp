@@ -28,3 +28,9 @@ void simple_command::append_redirect(redirect redir, std::string && file) {
         redirects.emplace(redir, std::move(file));
     }
 }
+
+void command_block::print_command(std::ostream & lhs) const {
+    lhs << "{\n";
+    for (auto & cmd : commands) lhs << *cmd << '\n';
+    lhs << '}' << std::endl;
+}

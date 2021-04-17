@@ -42,6 +42,11 @@ class command_block final : public command {
 
     ~command_block() noexcept final = default;
 
+    void append_command(command_ptr cmd) { commands.push_back(std::move(cmd)); }
+
+  protected:
+    void print_command(std::ostream &) const final;
+
   private:
     std::vector<command_ptr> commands{};
 };
