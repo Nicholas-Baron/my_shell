@@ -51,7 +51,7 @@ token tokenizer::next() {
         std::string raw;
         for (auto escaped = false; escaped or current_char() != c; ++pos) {
             assert(not empty());
-            const auto current = current_char();
+            auto current = current_char();
             if (current == '\\') {
                 // Add the slash if the last character was a slash.
                 if (escaped) { raw += current; }
@@ -67,7 +67,12 @@ token tokenizer::next() {
                 continue;
             }
 
-            // TODO: Support escapes like \n, \r, \t
+            // TODO: Support escapes like \r, \t
+            // TODO: Move into a separate function.
+            if (escaped and current == 'n') {
+                current = '\n';
+                escaped = false;
+            }
             assert(not escaped);
             raw += current;
         }
