@@ -36,8 +36,26 @@ void executor::execute(const simple_command & cmd) {
         close(parent_read);
         close(parent_write);
 
-        // TODO: Support redirects
-        if (dup2(child_read, STDIN_FILENO) < 0 or dup2(child_write, STDOUT_FILENO) < 0) {
+        auto input_fd = child_read;
+        if (auto iter = cmd.redirects.find(redirect::stdin); iter != cmd.redirects.end()) {
+            input_fd = open(iter->second.c_str(), O_RDONLY | O_CLOEXEC);
+            if (input_fd == -1) {
+                perror("open");
+                exit(1);
+            }
+        }
+
+        auto output_fd = child_write;
+        if (auto iter = cmd.redirects.find(redirect::stdout); iter != cmd.redirects.end()) {
+            // Create a file with rw-r--r-- permissions
+            output_fd = open(iter->second.c_str(), O_WRONLY | O_CREAT | O_CLOEXEC, 0644);
+            if (output_fd == -1) {
+                perror("open");
+                exit(1);
+            }
+        }
+
+        if (dup2(input_fd, STDIN_FILENO) < 0 or dup2(output_fd, STDOUT_FILENO) < 0) {
             perror("dup2");
             return;
         }
