@@ -37,7 +37,10 @@ int main(int arg_count, const char ** args) {
             for (auto & command : command_list) { std::cout << *command << std::endl; }
         }
 
-        for (auto & command : command_list) command->execute(e);
+        for (auto & command : command_list) {
+            command->execute(e);
+            e.wait_on_running_command();
+        }
     };
 
     if (arg_count == 2) {

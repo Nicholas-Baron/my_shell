@@ -1,4 +1,5 @@
 #include "command.h"
+
 #include "executor.h"
 
 #include <iostream>
@@ -36,4 +37,11 @@ void command_block::print_command(std::ostream & lhs) const {
     lhs << "{\n";
     for (auto & cmd : commands) lhs << *cmd << '\n';
     lhs << '}' << std::endl;
+}
+
+void command_block::execute(executor & e) const {
+    for (auto & cmd : commands) {
+        cmd->execute(e);
+        e.wait_on_running_command();
+    }
 }

@@ -48,9 +48,7 @@ class command_block final : public command {
 
     void append_command(command_ptr cmd) { commands.push_back(std::move(cmd)); }
 
-    void execute(executor & e) const {
-        for (auto & cmd : commands) cmd->execute(e);
-    }
+    void execute(executor & e) const;
 
   protected:
     void print_command(std::ostream &) const final;

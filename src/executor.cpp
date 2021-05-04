@@ -3,6 +3,7 @@
 #include <sys/wait.h> // waitpid
 
 #include <array>
+#include <cassert>
 #include <cstring>  // strcpy
 #include <fcntl.h>  // open
 #include <stdio.h>  // perror
@@ -10,6 +11,47 @@
 
 static char * allocate_c_str(const std::string & str) {
     return strcpy(new char[str.size() + 1], str.c_str());
+}
+
+void executor::wait_on_running_command() {
+
+    auto pid = current_command.value();
+
+    auto iter = active_commands.find(pid);
+    assert(iter != active_commands.end());
+    auto parent_read = iter->second.parent_read;
+
+    for (std::array<char, 256> buf;;) {
+        buf.fill(0);
+
+        const auto rc = waitpid(pid, &last_status, WNOHANG);
+        if (rc == pid) break;
+
+        if (rc < 0) {
+            perror("waitpid");
+            last_status = -1;
+            return;
+        }
+
+        while (true) {
+
+            const auto nread = read(parent_read, buf.data(), buf.size());
+            if (nread < 0) {
+                perror("read");
+                last_status = -1;
+                return;
+            }
+
+            if (nread == 0) break;
+
+            for (auto i = 0; i < nread; ++i) {
+                putchar(buf[i]);
+                buf[i] = 0;
+            }
+        }
+    }
+
+    current_command.reset();
 }
 
 void executor::execute(const simple_command & cmd) {
@@ -83,33 +125,7 @@ void executor::execute(const simple_command & cmd) {
         close(child_read);
         close(child_write);
 
-        for (std::array<char, 256> buf;;) {
-            buf.fill(0);
-
-            const auto rc = waitpid(pid, &last_status, WNOHANG);
-            if (rc == pid) break;
-
-            if (rc < 0) {
-                perror("waitpid");
-                last_status = -1;
-                return;
-            }
-
-            while (true) {
-                const auto nread = read(parent_read, buf.data(), buf.size());
-                if (nread < 0) {
-                    perror("read");
-                    last_status = -1;
-                    return;
-                }
-
-                if (nread == 0) break;
-
-                for (auto i = 0; i < nread; ++i) {
-                    putchar(buf[i]);
-                    buf[i] = 0;
-                }
-            }
-        }
+        current_command = pid;
+        active_commands.emplace(pid, command_data{parent_read, parent_write});
     }
 }
