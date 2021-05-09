@@ -79,7 +79,21 @@ void executor::execute(const simple_command & cmd) {
         close(parent_write);
 
         auto input_fd = child_read;
-        if (auto iter = cmd.redirects.find(redirect::stdin); iter != cmd.redirects.end()) {
+        // TODO: Avoid the `pipe` syscall when creating pipes
+        if (current_connect == connection::pipe) {
+
+            assert(current_command.has_value());
+            auto parent_pid = current_command.value();
+
+            // Remount the pipes to be the ones from the previous command
+            // One way only
+            close(input_fd);
+
+            auto iter = active_commands.find(parent_pid);
+            assert(iter != active_commands.end());
+
+            input_fd = iter->second.parent_read;
+        } else if (auto iter = cmd.redirects.find(redirect::stdin); iter != cmd.redirects.end()) {
             input_fd = open(iter->second.c_str(), O_RDONLY | O_CLOEXEC);
             if (input_fd == -1) {
                 perror("open");

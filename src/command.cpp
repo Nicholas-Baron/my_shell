@@ -33,6 +33,26 @@ void simple_command::append_redirect(redirect redir, std::string && file) {
 
 void simple_command::execute(executor & executor) const { executor.execute(*this); }
 
+void pipeline::print_command(std::ostream & lhs) const {
+    bool first = true;
+    for (auto & cmd : commands) {
+        if (first) first = false;
+        else
+            lhs << " | ";
+
+        lhs << *cmd;
+    }
+}
+
+void pipeline::execute(executor & e) const {
+    for (auto i = 0u; i < commands.size(); ++i) {
+        if (i != 0u) e.set_connect_state(executor::connection::pipe);
+
+        commands.at(i)->execute(e);
+    }
+    e.set_connect_state(executor::connection::separate);
+}
+
 void command_block::print_command(std::ostream & lhs) const {
     lhs << "{\n";
     for (auto & cmd : commands) lhs << *cmd << '\n';

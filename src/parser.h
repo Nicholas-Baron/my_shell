@@ -23,12 +23,14 @@ class parser final {
     [[nodiscard]] command_ptr parse_command();
     [[nodiscard]] command_ptr parse_simple_command(std::string && name);
     [[nodiscard]] command_ptr parse_command_block();
+    [[nodiscard]] command_ptr parse_pipeline(simple_command &&);
 
     token next();
     token & peek();
 
     tokenizer token_generator;
     std::optional<token> peeked;
+    bool in_pipeline{false};
 };
 
 #endif

@@ -72,10 +72,30 @@ command_ptr parser::parse_simple_command(std::string && name) {
             continue;
         }
 
+        if (peek().type() == token_type::pipe and not in_pipeline) {
+            return parse_pipeline(std::move(cmd));
+        }
+
         break;
     }
 
     return std::make_unique<simple_command>(std::move(cmd));
+}
+
+command_ptr parser::parse_pipeline(simple_command && start) {
+
+    in_pipeline = true;
+
+    pipeline result;
+    result.append_command(std::make_unique<simple_command>(std::move(start)));
+
+    while (peek().type() == token_type::pipe) {
+        next();
+        result.append_command(parse_command());
+    }
+
+    in_pipeline = false;
+    return std::make_unique<pipeline>(std::move(result));
 }
 
 command_ptr parser::parse_command_block() {

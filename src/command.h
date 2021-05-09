@@ -57,6 +57,26 @@ class command_block final : public command {
     std::vector<command_ptr> commands{};
 };
 
+class pipeline final : public command {
+  public:
+    pipeline() = default;
+
+    pipeline(pipeline &&) noexcept = default;
+    pipeline & operator=(pipeline &&) noexcept = default;
+
+    ~pipeline() noexcept final = default;
+
+    void append_command(command_ptr cmd) { commands.push_back(std::move(cmd)); }
+
+    void execute(executor &) const;
+
+  protected:
+    void print_command(std::ostream &) const final;
+
+  private:
+    std::vector<command_ptr> commands{};
+};
+
 enum class redirect {
     stdin,
     stdout,
