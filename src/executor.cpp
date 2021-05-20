@@ -118,17 +118,14 @@ void executor::execute(const simple_command & cmd) {
 
         auto * executable = allocate_c_str(cmd.executable);
 
-        auto ** args = new char *[cmd.arguments.size() + 2];
-        {
-            auto i = 0;
-            args[i++] = executable;
-            for (auto & arg : cmd.arguments) args[i++] = allocate_c_str(arg);
-            args[i] = nullptr;
-        }
+        std::vector<char *> args;
+        args.push_back(executable);
+        for (auto & arg : cmd.arguments) args.push_back(allocate_c_str(arg));
+        args.push_back(nullptr);
 
         // TODO: Remove `p` and do our own path traversal?
         // TODO: Add `e` to pass different environment
-        if (execvp(executable, args) < 0) {
+        if (execvp(executable, args.data()) < 0) {
             perror("execvp");
             return;
         }
