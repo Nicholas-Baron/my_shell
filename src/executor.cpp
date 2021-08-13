@@ -4,6 +4,7 @@
 
 #include <array>
 #include <cassert>
+#include <cstdlib>  // exit
 #include <cstring>  // strcpy
 #include <fcntl.h>  // open
 #include <stdio.h>  // perror
@@ -55,6 +56,11 @@ void executor::wait_on_running_command() {
 }
 
 void executor::execute(const simple_command & cmd) {
+
+    if (auto iter = builtins.find(cmd.executable); iter != builtins.end()) {
+        (this->*(iter->second))(cmd);
+        return;
+    }
 
     int to_parent[2]{0, 0};
     int to_child[2]{0, 0};
@@ -140,3 +146,5 @@ void executor::execute(const simple_command & cmd) {
         active_commands.emplace(pid, command_data{parent_read, parent_write});
     }
 }
+
+void executor::shell_exit(const simple_command &) { std::exit(0); }

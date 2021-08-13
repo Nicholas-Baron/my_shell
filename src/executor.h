@@ -4,7 +4,9 @@
 #include "command.h"
 #include <sys/types.h>
 
+#include <map>
 #include <optional>
+#include <string>
 
 class executor final {
   public:
@@ -18,6 +20,12 @@ class executor final {
     void set_connect_state(connection conn) noexcept { current_connect = conn; }
 
   private:
+    // builtins
+    void shell_exit(const simple_command &);
+
+    inline static const std::map<std::string, void (executor::*)(const simple_command &)> builtins{
+        std::pair{std::string{"exit"}, &executor::shell_exit}};
+
     struct command_data {
         int parent_read;
         int parent_write;
