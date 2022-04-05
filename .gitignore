@@ -1,5 +1,6 @@
 build/*
 todo.txt
+tidy.txt
 
 .cache/*
 compile_commands.json
