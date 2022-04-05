@@ -1,0 +1,50 @@
+# Documentation: https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+# Formatting
+ColumnLimit: 100
+IndentWidth: 4
+NamespaceIndentation: All
+TabWidth: 4
+UseTab: Never
+
+MaxEmptyLinesToKeep: 1
+
+# Alignment checks
+AlignOperands: AlignAfterOperator
+AlignTrailingComments: true
+AlignAfterOpenBracket: Align
+AlignEscapedNewlines: Left
+
+# Allowed shortenings
+AllowShortBlocksOnASingleLine: true
+AllowShortFunctionsOnASingleLine: All
+AllowShortIfStatementsOnASingleLine: Always
+AllowShortLoopsOnASingleLine: true
+BreakBeforeBraces: Attach
+
+AlwaysBreakTemplateDeclarations: Yes
+
+BreakConstructorInitializers: BeforeComma
+DerivePointerAlignment: false
+PointerAlignment: Middle
+
+BreakBeforeBinaryOperators: All
+BreakBeforeTernaryOperators: true
+
+SpaceAfterTemplateKeyword: false
+SpaceBeforeAssignmentOperators: true
+
+SortIncludes: true
+SortUsingDeclarations: true
+
+IncludeBlocks: Regroup
+IncludeCategories:
+# local includes
+  - Regex: '".*\.hp*"'
+    Priority: 1
+# standard library
+  - Regex: '<[[:alpha:]_]+>'
+    Priority: 2
+# other angled
+  - Regex: '<[[:alnum:]./_]+>'
+    Priority: 3
+

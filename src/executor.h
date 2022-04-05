@@ -2,11 +2,12 @@
 #define EXECUTOR_H
 
 #include "command.h"
-#include <sys/types.h>
 
 #include <map>
 #include <optional>
 #include <string>
+
+#include <sys/types.h>
 
 class executor final {
   public:

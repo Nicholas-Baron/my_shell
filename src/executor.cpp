@@ -1,14 +1,14 @@
 #include "executor.h"
 
-#include <sys/wait.h> // waitpid
-
 #include <array>
 #include <cassert>
-#include <cstdlib>  // exit
-#include <cstring>  // strcpy
-#include <fcntl.h>  // open
-#include <stdio.h>  // perror
-#include <unistd.h> // fork, exec
+#include <cstdlib> // exit
+#include <cstring> // strcpy
+
+#include <fcntl.h>    // open
+#include <stdio.h>    // perror
+#include <sys/wait.h> // waitpid
+#include <unistd.h>   // fork, exec
 
 static char * allocate_c_str(const std::string & str) {
     return strcpy(new char[str.size() + 1], str.c_str());

@@ -115,4 +115,3 @@ token tokenizer::next() {
         exit(2);
     }
 }
-
