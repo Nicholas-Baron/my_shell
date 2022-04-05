@@ -1,2 +1,5 @@
 build/*
 todo.txt
+
+.cache/*
+compile_commands.json
